@@ -3,17 +3,34 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // webcam connection using WebRTC
-window.onload = function(){
+window.onload = function() {
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-    const constraints = { audio: false, video: { facingMode: { exact: "environment" } }  };
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream )
-    .catch((err) => {
-        alert(err.name + ": " + err.message);	
-        video.src = "marker.webm";
-    });
+
+    // Function to handle media stream
+    function startStream(constraints) {
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then((stream) => {
+            video.srcObject = stream;
+        })
+        .catch((err) => {
+            alert(err.name + ": " + err.message);
+            if (constraints.video.facingMode === "environment") {
+                // Retry with user-facing camera if environment-facing fails
+                console.log("Retrying with user-facing camera...");
+                startStream({ audio: false, video: { facingMode: "user" } });
+            } else {
+                // If already using user-facing camera, fall back to a marker
+                video.src = "marker.webm";
+            }
+        });
+    }
+
+    // Initial constraints for environment-facing camera
+    const initialConstraints = { audio: false, video: { facingMode: { exact: "environment" } } };
+    startStream(initialConstraints);
 }
+
 
 function start_processing(){
     // canvas & video
