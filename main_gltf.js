@@ -1,87 +1,90 @@
-// final project
-
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'; // Updated path for GLTFLoader
+import { ARController } from 'ar-js'; // Make sure you have AR.js available and correctly imported
 
-// webcam connection using WebRTC
-window.onload = function(){
-    const video = document.getElementById("myvideo");	
-    video.onloadedmetadata = start_processing;
-    const constraints = {audio: false, video: true};
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream )
-    .catch((err) => {
-        alert(err.name + ": " + err.message);	
-        video.src = "marker.webm";
-    });
+window.onload = async function() {
+    const video = document.getElementById("myvideo");
+
+    // Set up webcam connection using WebRTC
+    try {
+        const constraints = { audio: false, video: { facingMode: "environment" } }; // Use back camera if available
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        await new Promise(resolve => video.onloadedmetadata = resolve); // Ensure metadata is loaded before starting processing
+        start_processing();
+    } catch (err) {
+        alert(err.name + ": " + err.message);
+        video.src = "marker.webm"; // Fallback if webcam is not available
+    }
 }
 
-function start_processing(){
-    // canvas & video
+async function start_processing() {
     const video = document.getElementById("myvideo");
     const canvas = document.getElementById("mycanvas");
+
+    // Update canvas size based on video dimensions
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     video.width = video.height = 0;
 
-    // three.js
-    const renderer = new THREE.WebGLRenderer( { canvas: canvas } );
+    // three.js setup
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas });
     const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
+    const camera = new THREE.PerspectiveCamera(); // Use PerspectiveCamera instead of Camera
     scene.add(camera);
 
-    // background
-    const bgtexture = new THREE.VideoTexture( video );
+    // Set up background with video texture
+    const bgtexture = new THREE.VideoTexture(video);
     bgtexture.colorSpace = THREE.SRGBColorSpace;
     scene.background = bgtexture;
 
-    // container + object
+    // Container and object setup
     const container = new THREE.Object3D();
     container.matrixAutoUpdate = false;
     scene.add(container);
+
     const loader = new GLTFLoader();
     loader.load('player0.glb', model => {
         container.add(model.scene);
     });
-    const light = new THREE.AmbientLight(0xffffff,10);
+
+    const light = new THREE.AmbientLight(0xffffff, 10);
     container.add(light);
 
-    // jsartoolkit
+    // ARController setup
     let arLoaded = false;
-    let lastdetectiontime = 0;
+    let lastDetectionTime = 0;
     let kanjiID;
+
     const arController = new ARController(video, 'camera_para.dat');
     arController.onload = () => {
-        camera.projectionMatrix.fromArray( arController.getCameraMatrix() );
+        camera.projectionMatrix.fromArray(arController.getCameraMatrix());
         arController.setPatternDetectionMode(artoolkit.AR_TEMPLATE_MATCHING_COLOR);
-        arController.loadMarker('kanji.patt', id => kanjiID = id );
+        arController.loadMarker('kanji.patt', id => kanjiID = id);
         arController.addEventListener('getMarker', ev => {
-            if(ev.data.marker.idPatt == kanjiID){
-                // container.matrix.fromArray( ev.data.matrixGL_RH );
-                fixMatrix(container.matrix, ev.data.matrixGL_RH );
-                lastdetectiontime = performance.now();
+            if (ev.data.marker.idPatt === kanjiID) {
+                fixMatrix(container.matrix, ev.data.matrixGL_RH);
+                lastDetectionTime = performance.now();
             }
         });
         arLoaded = true;
     }
 
-    // render loop
-    function renderloop() {
-        requestAnimationFrame( renderloop );
-        if(arLoaded)
+    // Render loop
+    function renderLoop() {
+        requestAnimationFrame(renderLoop);
+        if (arLoaded) {
             arController.process(video);
-        if(performance.now()-lastdetectiontime < 100)
-            container.visible = true;
-        else
-            container.visible = false;
-        renderer.render( scene, camera );
+        }
+        container.visible = performance.now() - lastDetectionTime < 100;
+        renderer.render(scene, camera);
     }
-    renderloop();
+    renderLoop();
 }
 
-// fix the marker matrix to compensate Y-up models
-function fixMatrix(three_mat, m){
-    three_mat.set(
+// Fix the marker matrix to compensate for Y-up models
+function fixMatrix(threeMat, m) {
+    threeMat.set(
         m[0], m[8], -m[4], m[12],
         m[1], m[9], -m[5], m[13],
         m[2], m[10], -m[6], m[14],
