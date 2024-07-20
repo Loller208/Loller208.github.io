@@ -10,10 +10,7 @@ window.onload = async function() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
-    const constraints = {
-        audio: false,
-        video: { facingMode: "user" }
-    };
+    const constraints = { audio: false, video: { facingMode: "user" } }
 
     // Ottieni lo stream video
     navigator.mediaDevices.getUserMedia(constraints)
