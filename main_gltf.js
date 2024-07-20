@@ -40,7 +40,7 @@ function start_processing(){
     container.matrixAutoUpdate = false;
     scene.add(container);
     const loader = new GLTFLoader();
-    loader.load('retro_cartoon_car.glb', model => {
+    loader.load('player0.glb', model => {
         container.add(model.scene);
     });
     const light = new THREE.AmbientLight(0xffffff,10);
