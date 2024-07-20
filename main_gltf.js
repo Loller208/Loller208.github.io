@@ -1,21 +1,22 @@
-// final project
-
+@@ -1,19 +1,16 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
 // webcam connection using WebRTC
-window.onload = function(){
+window.onload = async function() {
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
+    // Ottieni la lista dei dispositivi video
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
     const constraints = { audio: false, video: { exact: "environment" } };
+    // Ottieni lo stream video
     navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream )
+    .then((stream) => video.srcObject = stream)
     .catch((err) => {
         alert(err.name + ": " + err.message);	
         video.src = "marker.webm";
     });
 }
-
 function start_processing(){
     // canvas & video
     const video = document.getElementById("myvideo");
@@ -23,18 +24,15 @@ function start_processing(){
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     video.width = video.height = 0;
-
     // three.js
     const renderer = new THREE.WebGLRenderer( { canvas: canvas } );
     const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
+    const camera = new THREE.PerspectiveCamera(); // Cambiato da THREE.Camera a THREE.PerspectiveCamera
     scene.add(camera);
-
     // background
     const bgtexture = new THREE.VideoTexture( video );
     bgtexture.colorSpace = THREE.SRGBColorSpace;
     scene.background = bgtexture;
-
     // container + object
     const container = new THREE.Object3D();
     container.matrixAutoUpdate = false;
@@ -45,9 +43,8 @@ function start_processing(){
     });
     const light = new THREE.AmbientLight(0xffffff,10);
     container.add(light);
-
     // jsartoolkit
-	let arLoaded = false;
+    let arLoaded = false;
     let lastdetectiontime = 0;
     let kanjiID;
     const arController = new ARController(video, 'camera_para.dat');
@@ -63,7 +60,6 @@ function start_processing(){
         });
         arLoaded = true;
     }
-
     // render loop
     function renderloop() {
         requestAnimationFrame( renderloop );
@@ -77,7 +73,6 @@ function start_processing(){
     }
     renderloop();
 }
-
 // fix the marker matrix to compensate Y-up models
 function fixMatrix(three_mat, m){
     three_mat.set(
