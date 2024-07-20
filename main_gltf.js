@@ -1,22 +1,20 @@
-@@ -1,19 +1,16 @@
+
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 // webcam connection using WebRTC
-window.onload = async function() {
+window.onload = function(){
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-    // Ottieni la lista dei dispositivi video
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
     const constraints = { audio: false, video: { exact: "environment" } };
-    // Ottieni lo stream video
     navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream)
+    .then((stream) => video.srcObject = stream )
     .catch((err) => {
         alert(err.name + ": " + err.message);	
         video.src = "marker.webm";
     });
 }
+
 function start_processing(){
     // canvas & video
     const video = document.getElementById("myvideo");
