@@ -25,24 +25,11 @@ window.onload = async function() {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = stream;
     } catch (err) {
-        console.warn("Non è stato possibile ottenere la fotocamera posteriore, riprovo con la fotocamera predefinita.", err);
-        
-        // Usa la fotocamera predefinita se la fotocamera posteriore non è disponibile
-        const defaultConstraints = {
-            audio: false,
-            video: { facingMode: { exact: "environment" } }  // Prova di nuovo con facingMode per la posteriore
-        };
-        
-        try {
-            const fallbackStream = await navigator.mediaDevices.getUserMedia(defaultConstraints);
-            video.srcObject = fallbackStream;
-        } catch (fallbackErr) {
-            // In caso di errore con la fotocamera predefinita, utilizza un file video di fallback
-            alert(fallbackErr.name + ": " + fallbackErr.message);
-            video.src = "marker.webm";
-        }
+        alert(err.name + ": " + err.message);	
+        video.src = "marker.webm";
     }
 }
+
 
 
 function start_processing(){
