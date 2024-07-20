@@ -3,34 +3,17 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // webcam connection using WebRTC
-window.onload = async function() {
+window.onload = function(){
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-
-    try {
-        // Ottieni la lista dei dispositivi video
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(device => device.kind === 'videoinput');
-        
-        // Trova la fotocamera posteriore
-        const rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
-        
-        // Crea le constraints per utilizzare il dispositivo trovato
-        const constraints = {
-            audio: false,
-            video: { deviceId: { exact: rearCamera.deviceId } }
-        };
-
-        // Ottieni lo stream video
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-    } catch (err) {
+    const constraints = { audio: false, video: { facingMode: { exact: "environment" } }  };
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => video.srcObject = stream )
+    .catch((err) => {
         alert(err.name + ": " + err.message);	
         video.src = "marker.webm";
-    }
+    });
 }
-
-
 
 function start_processing(){
     // canvas & video
