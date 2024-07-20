@@ -47,15 +47,16 @@ function start_processing(){
     container.add(light);
 
     // jsartoolkit
-    let arLoaded = false;
+	let arLoaded = false;
     let lastdetectiontime = 0;
+    let kanjiID;
     const arController = new ARController(video, 'camera_para.dat');
     arController.onload = () => {
         camera.projectionMatrix.fromArray( arController.getCameraMatrix() );
-        arController.setPatternDetectionMode(artoolkit.AR_MATRIX_CODE_DETECTION);
+        arController.setPatternDetectionMode(artoolkit.AR_TEMPLATE_MATCHING_COLOR);
+        arController.loadMarker('kanji.patt', id => kanjiID = id );
         arController.addEventListener('getMarker', ev => {
-            if(ev.data.marker.idMatrix != -1){
-                // container.matrix.fromArray( ev.data.matrixGL_RH );
+            if(ev.data.marker.idPatt == kanjiID){
                 fixMatrix(container.matrix, ev.data.matrixGL_RH );
                 lastdetectiontime = performance.now();
             }
