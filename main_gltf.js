@@ -14,14 +14,17 @@ window.onload = function() {
             video.srcObject = stream;
         })
         .catch((err) => {
-            alert(err.name + ": " + err.message);
-            if (constraints.video.facingMode === "environment") {
-                // Retry with user-facing camera if environment-facing fails
-                console.log("Retrying with user-facing camera...");
+            if (err.name === 'OverconstrainedError' && constraints.video.facingMode.exact === "environment") {
+                // If the environment-facing camera fails, retry with user-facing camera
+                console.log("Environment-facing camera not available. Retrying with user-facing camera...");
                 startStream({ audio: false, video: { facingMode: "user" } });
             } else {
-                // If already using user-facing camera, fall back to a marker
-                video.src = "marker.webm";
+                // Handle other errors or fallback to marker if retrying with user-facing camera fails
+                alert(err.name + ": " + err.message);
+                if (constraints.video.facingMode === "user") {
+                    // If already using user-facing camera, fall back to a marker
+                    video.src = "marker.webm";
+                }
             }
         });
     }
@@ -30,7 +33,6 @@ window.onload = function() {
     const initialConstraints = { audio: false, video: { facingMode: { exact: "environment" } } };
     startStream(initialConstraints);
 }
-
 
 function start_processing(){
     // canvas & video
