@@ -1,15 +1,26 @@
-// final project
-
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // webcam connection using WebRTC
-window.onload = function(){
+window.onload = async function() {
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-    const constraints = {audio: false, video: true};
+
+    // Ottieni la lista dei dispositivi video
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+    
+    // Trova il deviceId della fotocamera posteriore (se presente)
+    const rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
+
+    const constraints = {
+        audio: false,
+        video: { deviceId: { exact: rearCamera.deviceId } }
+    };
+
+    // Ottieni lo stream video
     navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream )
+    .then((stream) => video.srcObject = stream)
     .catch((err) => {
         alert(err.name + ": " + err.message);	
         video.src = "marker.webm";
@@ -27,7 +38,7 @@ function start_processing(){
     // three.js
     const renderer = new THREE.WebGLRenderer( { canvas: canvas } );
     const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
+    const camera = new THREE.PerspectiveCamera(); // Cambiato da THREE.Camera a THREE.PerspectiveCamera
     scene.add(camera);
 
     // background
@@ -57,7 +68,6 @@ function start_processing(){
         arController.loadMarker('kanji.patt', id => kanjiID = id );
         arController.addEventListener('getMarker', ev => {
             if(ev.data.marker.idPatt == kanjiID){
-                // container.matrix.fromArray( ev.data.matrixGL_RH );
                 fixMatrix(container.matrix, ev.data.matrixGL_RH );
                 lastdetectiontime = performance.now();
             }
