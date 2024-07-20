@@ -3,35 +3,16 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // webcam connection using WebRTC
-window.onload = function() {
+window.onload = function(){
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-
-    // Function to handle media stream
-    function startStream(constraints) {
-        navigator.mediaDevices.getUserMedia(constraints)
-        .then((stream) => {
-            video.srcObject = stream;
-        })
-        .catch((err) => {
-            if (err.name === 'OverconstrainedError' && constraints.video.facingMode.exact === "environment") {
-                // If the environment-facing camera fails, retry with user-facing camera
-                console.log("Environment-facing camera not available. Retrying with user-facing camera...");
-                startStream({ audio: false, video: { facingMode: "user" } });
-            } else {
-                // Handle other errors or fallback to marker if retrying with user-facing camera fails
-                alert(err.name + ": " + err.message);
-                if (constraints.video.facingMode === "user") {
-                    // If already using user-facing camera, fall back to a marker
-                    video.src = "marker.webm";
-                }
-            }
-        });
-    }
-
-    // Initial constraints for environment-facing camera
-    const initialConstraints = { audio: false, video: { facingMode: { exact: "environment" } } };
-    startStream(initialConstraints);
+    const constraints = { audio: false, video: { facingMode: { exact: "environment" } }  };
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => video.srcObject = stream )
+    .catch((err) => {
+        alert(err.name + ": " + err.message);	
+        video.src = "marker.webm";
+    });
 }
 
 function start_processing(){
