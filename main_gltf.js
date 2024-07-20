@@ -1,20 +1,15 @@
+// final project
+
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // webcam connection using WebRTC
-window.onload = async function() {
+window.onload = function(){
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-
-    // Ottieni la lista dei dispositivi video
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
-    const constraints = { audio: false, video: { facingMode: "user" } }
-
-    // Ottieni lo stream video
+    const constraints = { audio: false, video: { facingMode: "user" } };
     navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream)
+    .then((stream) => video.srcObject = stream )
     .catch((err) => {
         alert(err.name + ": " + err.message);	
         video.src = "marker.webm";
@@ -32,7 +27,7 @@ function start_processing(){
     // three.js
     const renderer = new THREE.WebGLRenderer( { canvas: canvas } );
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(); // Cambiato da THREE.Camera a THREE.PerspectiveCamera
+    const camera = new THREE.Camera();
     scene.add(camera);
 
     // background
@@ -45,7 +40,7 @@ function start_processing(){
     container.matrixAutoUpdate = false;
     scene.add(container);
     const loader = new GLTFLoader();
-    loader.load('player0.glb', model => {
+    loader.load('retro_cartoon_car.glb', model => {
         container.add(model.scene);
     });
     const light = new THREE.AmbientLight(0xffffff,10);
@@ -54,14 +49,13 @@ function start_processing(){
     // jsartoolkit
     let arLoaded = false;
     let lastdetectiontime = 0;
-    let kanjiID;
     const arController = new ARController(video, 'camera_para.dat');
     arController.onload = () => {
         camera.projectionMatrix.fromArray( arController.getCameraMatrix() );
-        arController.setPatternDetectionMode(artoolkit.AR_TEMPLATE_MATCHING_COLOR);
-        arController.loadMarker('kanji.patt', id => kanjiID = id );
+        arController.setPatternDetectionMode(artoolkit.AR_MATRIX_CODE_DETECTION);
         arController.addEventListener('getMarker', ev => {
-            if(ev.data.marker.idPatt == kanjiID){
+            if(ev.data.marker.idMatrix != -1){
+                // container.matrix.fromArray( ev.data.matrixGL_RH );
                 fixMatrix(container.matrix, ev.data.matrixGL_RH );
                 lastdetectiontime = performance.now();
             }
