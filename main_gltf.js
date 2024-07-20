@@ -9,13 +9,10 @@ window.onload = async function() {
     // Ottieni la lista dei dispositivi video
     const devices = await navigator.mediaDevices.enumerateDevices();
     const videoDevices = devices.filter(device => device.kind === 'videoinput');
-    
-    // Trova il deviceId della fotocamera posteriore (se presente)
-    const rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
 
     const constraints = {
         audio: false,
-        video: { deviceId: { exact: rearCamera.deviceId } }
+        video: { facingMode: "user" } }
     };
 
     // Ottieni lo stream video
