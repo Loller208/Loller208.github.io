@@ -12,7 +12,7 @@ window.onload = async function() {
 
     const constraints = {
         audio: false,
-        video: { facingMode: "user" } }
+        video: { facingMode: "user" }
     };
 
     // Ottieni lo stream video
