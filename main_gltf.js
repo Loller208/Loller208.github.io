@@ -3,17 +3,47 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // webcam connection using WebRTC
-window.onload = function(){
+window.onload = async function() {
     const video = document.getElementById("myvideo");	
     video.onloadedmetadata = start_processing;
-    const constraints = { audio: false, video: { facingMode: { exact: "environment" } }  };
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then((stream) => video.srcObject = stream )
-    .catch((err) => {
-        alert(err.name + ": " + err.message);	
-        video.src = "marker.webm";
-    });
+
+    try {
+        // Ottieni la lista dei dispositivi video
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+        
+        // Trova la fotocamera posteriore
+        const rearCamera = videoDevices.find(device => device.label.toLowerCase().includes('back')) || videoDevices[0];
+        
+        // Crea le constraints per utilizzare il dispositivo trovato
+        const constraints = {
+            audio: false,
+            video: { deviceId: { exact: rearCamera.deviceId } }
+        };
+
+        // Ottieni lo stream video
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+    } catch (err) {
+        console.warn("Non è stato possibile ottenere la fotocamera posteriore, riprovo con la fotocamera predefinita.", err);
+        
+        // Usa la fotocamera predefinita se la fotocamera posteriore non è disponibile
+        const defaultConstraints = {
+            audio: false,
+            video: { facingMode: { exact: "environment" } }  // Prova di nuovo con facingMode per la posteriore
+        };
+        
+        try {
+            const fallbackStream = await navigator.mediaDevices.getUserMedia(defaultConstraints);
+            video.srcObject = fallbackStream;
+        } catch (fallbackErr) {
+            // In caso di errore con la fotocamera predefinita, utilizza un file video di fallback
+            alert(fallbackErr.name + ": " + fallbackErr.message);
+            video.src = "marker.webm";
+        }
+    }
 }
+
 
 function start_processing(){
     // canvas & video
