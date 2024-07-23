@@ -39,7 +39,8 @@ function start_processing(){
     loader.load('table0.glb', model => { 
         container.add(model.scene);
     });
-    const light = new THREE.AmbientLight(0xffffff,10);
+    const light = new THREE.DirectionalLight(0xffffff, 1);//new THREE.AmbientLight(0xffffff,10);
+    light.position.set(0, 0, 10);
     container.add(light);
     // jsartoolkit
     let arLoaded = false;
