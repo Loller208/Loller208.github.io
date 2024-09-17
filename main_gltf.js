@@ -36,7 +36,7 @@ function start_processing(){
     container.matrixAutoUpdate = false;
     scene.add(container);
     const loader = new GLTFLoader();
-    loader.load('cuore.glb', model => { 
+    loader.load('table.glb', model => { 
         container.add(model.scene);
     });
     const light = new THREE.DirectionalLight(0xffffff, 1);//new THREE.AmbientLight(0xffffff,10);
