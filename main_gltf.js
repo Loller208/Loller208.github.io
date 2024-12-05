@@ -44,11 +44,16 @@ function start_processing(){
     });
     
     loader.load('cuore.glb', model => { 
-        // Itera su tutti i mesh del modello
         model.scene.traverse((node) => {
             if (node.isMesh) {
-                node.material.map = texture; // Applica la texture al materiale
-                node.material.needsUpdate = true; // Aggiorna il materiale per applicare la texture
+                node.geometry.computeVertexNormals(); // Assicurati che le normali siano corrette
+                node.material = new THREE.MeshStandardMaterial({
+                    color: 0xffffff, // Imposta il colore o la texture
+                    map: texture, // Applica la texture
+                    roughness: 0.5, // Imposta la ruvidità
+                    metalness: 0.5  // Imposta la metallicità
+                });
+                node.material.needsUpdate = true; // Forza l'aggiornamento del materiale
             }
         });
         container.add(model.scene);
