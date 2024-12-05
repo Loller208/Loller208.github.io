@@ -54,7 +54,7 @@ function start_processing(){
     });
 
     // Aggiungi una luce ambientale
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Colore bianco, intensità 1
+    const ambientLight = new THREE.AmbientLight(0xffffff, 10); // Colore bianco, intensità 1
     scene.add(ambientLight);
 
     // jsartoolkit
