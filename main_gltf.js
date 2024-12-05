@@ -52,7 +52,7 @@ function start_processing(){
     });
 
     // Secondo modello (secondo.glb) senza texture
-    loader.load('secondo.glb', model => {
+    loader.load('testo.glb', model => {
         container2.add(model.scene); // Aggiungi direttamente senza modificare il materiale
     });
 
