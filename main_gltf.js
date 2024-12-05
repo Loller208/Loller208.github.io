@@ -42,6 +42,8 @@ function start_processing(){
     const texture = textureLoader.load('texture.jpg', () => {
         console.log('Texture caricata');
     });
+
+    texture.flipY = false;
     
     loader.load('cuore.glb', model => { 
         model.scene.traverse((node) => {
