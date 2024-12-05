@@ -1,4 +1,3 @@
-
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -25,7 +24,7 @@ function start_processing(){
     // three.js
     const renderer = new THREE.WebGLRenderer( { canvas: canvas } );
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(); // Cambiato da THREE.Camera a THREE.PerspectiveCamera
+    const camera = new THREE.PerspectiveCamera();
     scene.add(camera);
     // background
     const bgtexture = new THREE.VideoTexture( video );
@@ -36,10 +35,25 @@ function start_processing(){
     container.matrixAutoUpdate = false;
     scene.add(container);
     const loader = new GLTFLoader();
+    const textureLoader = new THREE.TextureLoader(); // Loader per la texture
+
+    // Carica la texture desiderata
+    const texture = textureLoader.load('texture.jpg', () => {
+        console.log('Texture caricata');
+    });
+
     loader.load('cuore.glb', model => { 
+        // Itera su tutti i mesh del modello
+        model.scene.traverse((node) => {
+            if (node.isMesh) {
+                node.material.map = texture; // Applica la texture al materiale
+                node.material.needsUpdate = true; // Aggiorna il materiale per applicare la texture
+            }
+        });
         container.add(model.scene);
     });
-    const light = new THREE.DirectionalLight(0xffffff, 1);//new THREE.AmbientLight(0xffffff,10);
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(0, 0, 10);
     container.add(light);
     // jsartoolkit
@@ -72,6 +86,7 @@ function start_processing(){
     }
     renderloop();
 }
+
 // fix the marker matrix to compensate Y-up models
 function fixMatrix(three_mat, m){
     three_mat.set(
