@@ -38,7 +38,7 @@ function start_processing(){
     const textureLoader = new THREE.TextureLoader(); // Loader per la texture
 
     // Carica la texture desiderata
-    const texture = textureLoader.load('texture.jpg', () => {
+    const texture = textureLoader.load('path_to_texture.jpg', () => {
         console.log('Texture caricata');
     });
 
@@ -53,10 +53,9 @@ function start_processing(){
         container.add(model.scene);
     });
 
-    // Aggiungi una luce ambientale
-    const ambientLight = new THREE.AmbientLight(0xffffff, 10); // Colore bianco, intensità 1
-    scene.add(ambientLight);
-
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(0, 0, 10);
+    container.add(light);
     // jsartoolkit
     let arLoaded = false;
     let lastdetectiontime = 0;
