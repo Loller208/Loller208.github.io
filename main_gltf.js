@@ -54,7 +54,7 @@ function start_processing(){
     });
 
     const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(0, 0, 10);
+    light.position.set(0, 0, -10);
     container.add(light);
     // jsartoolkit
     let arLoaded = false;
