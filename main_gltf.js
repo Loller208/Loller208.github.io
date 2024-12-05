@@ -53,9 +53,10 @@ function start_processing(){
         container.add(model.scene);
     });
 
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(0, 0, -10);
-    container.add(light);
+    // Aggiungi una luce ambientale
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Colore bianco, intensità 1
+    scene.add(ambientLight);
+
     // jsartoolkit
     let arLoaded = false;
     let lastdetectiontime = 0;
