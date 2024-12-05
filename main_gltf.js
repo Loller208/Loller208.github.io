@@ -62,6 +62,8 @@ function start_processing(){
         container.add(model.scene);
     });
     
+    container.rotation.x = Math.PI;
+    
     const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Luce ambientale che illumina tutto uniformemente
     scene.add(ambientLight);
     
