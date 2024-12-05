@@ -41,7 +41,7 @@ function start_processing(){
     // Carica la texture desiderata
     const texture = textureLoader.load('texture.jpg', () => {
         console.log('Texture caricata');
-        texture.flipY = false;
+        texture.flipY = true;
     });
 
     
