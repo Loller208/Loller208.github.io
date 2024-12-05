@@ -59,9 +59,12 @@ function start_processing(){
         container.add(model.scene);
     });
     
-    const light = new THREE.DirectionalLight(0xffffff, 1);//new THREE.AmbientLight(0xffffff,10);
-    light.position.set(0, 0, 10);
-    container.add(light);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Luce ambientale che illumina tutto uniformemente
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1); // Luce direzionale
+    directionalLight.position.set(5, 10, 5); // Posiziona la luce
+    scene.add(directionalLight);
     // jsartoolkit
     let arLoaded = false;
     let lastdetectiontime = 0;
