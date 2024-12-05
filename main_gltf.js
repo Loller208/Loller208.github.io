@@ -41,15 +41,18 @@ function start_processing(){
 
     const loader = new GLTFLoader();
 
-    // Primo modello (cuore.glb)
+    const texture = textureLoader.load('texture.jpg', () => {
+        console.log('Texture caricata');
+    });
+
     loader.load('cuore.glb', model => { 
+        // Itera su tutti i mesh del modello
         model.scene.traverse((node) => {
             if (node.isMesh) {
-                node.material.needsUpdate = true; // Assicurati che il materiale sia aggiornato
+                node.material.map = texture; // Applica la texture al materiale
+                node.material.needsUpdate = true; // Aggiorna il materiale per applicare la texture
             }
         });
-        container1.add(model.scene);
-    });
 
     // Secondo modello (secondo.glb) senza texture
     loader.load('testo.glb', model => {
