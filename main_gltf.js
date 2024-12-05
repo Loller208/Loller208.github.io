@@ -38,7 +38,7 @@ function start_processing(){
     const textureLoader = new THREE.TextureLoader(); // Loader per la texture
 
     // Carica la texture desiderata
-    const texture = textureLoader.load('texture.jpg', () => {
+    const texture = textureLoader.load('0.jpg', () => {
         console.log('Texture caricata');
     });
 
